@@ -15,10 +15,23 @@ export const typeDefs = gql`
     room: Room!
     staffId: String
     staff: User
-    checkIn: String!
-    checkOut: String!
+    checkIn: DateTime!
+    checkOut: DateTime!
     status: BookingStatus!
     logs: [RoomLog!]!
+  }
+
+  input BookingInput {
+    roomId: Int!
+    customerId: String!
+    checkIn: DateTime!
+    checkOut: DateTime!
+  }
+
+  type BookingResponsePayload {
+    code: Int!
+    success: Boolean!
+    status: BookingStatus!
   }
 
   type Query {
@@ -29,12 +42,7 @@ export const typeDefs = gql`
 
   type Mutation {
     # Customer/Staff: Create a reservation
-    createBooking(
-      roomId: Int!
-      customerId: String!
-      checkIn: String!
-      checkOut: String!
-    ): Booking!
+    createBooking(input: BookingInput!): BookingResponsePayload!
 
     # Staff/Customer: Cancel a booking
     updateBookingStatus(id: Int!, status: BookingStatus!): Booking!

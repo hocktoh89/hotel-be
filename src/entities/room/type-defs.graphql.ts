@@ -8,7 +8,9 @@ export const typeDefs = gql`
   }
 
   input SearchRoomInput {
-    query: String!
+    category: RoomType
+    checkIn: DateTime!
+    checkOut: DateTime!
   }
 
   input createRoomInput {
@@ -27,7 +29,7 @@ export const typeDefs = gql`
   }
 
   type Query {
-    searchRooms(input: SearchRoomInput!): [Room!]!
+    searchAvailableRooms(input: SearchRoomInput!): [Room!]!
     # Staff & Customer: View available rooms
     rooms(category: RoomType): [Room!]!
     room(id: Int!): Room

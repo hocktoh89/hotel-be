@@ -1,22 +1,39 @@
 import { Resolvers } from '../../types/resolvers-types';
 
 const resolvers: Resolvers = {
+  Room: {
+    bookings: (parent) => {
+      return parent.bookings ?? [];
+    },
+  },
   Query: {
-    searchRooms: async (root, args, context) => {
-      const { query } = args.input;
+    searchAvailableRooms: async (root, { input }, { prisma }) => {
+      const { category, checkIn, checkOut } = input;
 
-      const jobs = await context.prisma.job.findMany({
-        where: {
-          OR: [
-            { location: { contains: query } },
-            { title: { contains: query } },
-          ],
+      const whereClause = {
+        ...(category && { category: { equals: category } }),
+
+        bookings: {
+          none: {
+            AND: [{ checkIn: { lt: checkOut } }, { checkOut: { gt: checkIn } }],
+          },
+        },
+      };
+
+      const jobs = await prisma.room.findMany({
+        where: whereClause,
+        include: {
+          bookings: true,
         },
       });
       return jobs;
     },
     rooms: async (root, args, context) => {
-      const rooms = await context.prisma.room.findMany();
+      const rooms = await context.prisma.room.findMany({
+        include: {
+          bookings: true,
+        },
+      });
       return rooms;
     },
   },
