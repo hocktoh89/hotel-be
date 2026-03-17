@@ -64,7 +64,7 @@ const resolvers: Resolvers = {
 
           process.env.JWT_SECRET as string,
           {
-            expiresIn: '24h',
+            expiresIn: process.env.JWT_EXPIRES_IN || '1h',
           },
         );
 

@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 
-const JWT_SECRET = 'my-token';
+const JWT_SECRET = process.env.JWT_SECRET || '';
 
 export interface Context {
   prisma: PrismaClient;
