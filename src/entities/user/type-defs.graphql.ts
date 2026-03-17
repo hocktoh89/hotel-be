@@ -15,8 +15,8 @@ export const typeDefs = gql`
     id: ID!
     token: String!
     expires: String!
-    createdAt: String!
-    updatedAt: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
 
     user: User!
   }
@@ -25,7 +25,7 @@ export const typeDefs = gql`
     id: String!
     token: String!
     expires: String!
-    createdAt: String!
+    createdAt: DateTime!
 
     user: User!
   }
@@ -35,8 +35,8 @@ export const typeDefs = gql`
     email: String!
     username: String!
     role: UserRole!
-    createdAt: String!
-    updatedAt: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
     bookings: [Booking!]!
     staffBookings: [Booking!]!
   }

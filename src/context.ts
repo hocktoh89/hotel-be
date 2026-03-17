@@ -38,7 +38,7 @@ const createContext = async ({
   req: Request;
   res: Response;
 }): Promise<Context> => {
-  const token = req.cookie?.token;
+  const token = req.cookies?.token;
   const user = parseToken(token);
 
   return {

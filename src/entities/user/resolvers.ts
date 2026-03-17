@@ -12,6 +12,12 @@ const resolvers: Resolvers = {
     me: async (root, args, context) => {
       if (!context.auth.user) {
         return null;
+        // throw new GraphQLError('Not authenticated', {
+        //   extensions: {
+        //     code: 'UNAUTHENTICATED',
+        //     http: { status: 401 },
+        //   },
+        // });
       }
 
       const user = await context.prisma.user.findUnique({
@@ -19,6 +25,12 @@ const resolvers: Resolvers = {
       });
 
       if (!user) {
+        // throw new GraphQLError('User not found', {
+        //   extensions: {
+        //     code: 'NOT_FOUND',
+        //     http: { status: 404 },
+        //   },
+        // });
         return null;
       }
 
@@ -61,10 +73,9 @@ const resolvers: Resolvers = {
             userId: user.id,
             email,
           },
-
           process.env.JWT_SECRET as string,
           {
-            expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+            expiresIn: '1h',
           },
         );
 
@@ -112,7 +123,7 @@ const resolvers: Resolvers = {
         code: 201,
         success: true,
         message: 'register in successful',
-        user,
+        user
       };
     },
   },

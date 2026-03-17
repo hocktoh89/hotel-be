@@ -1,5 +1,7 @@
+import { RoomType } from '@/generated/prisma/client';
+import { UserRole } from '@/generated/prisma/client';
+import { BookingStatus } from '@/generated/prisma/client';
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { RoomType, UserRole, BookingStatus } from '@/generated/prisma/client';
 import { Context } from '../context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -58,11 +60,7 @@ export type BookingResponsePayload = {
   success: Scalars['Boolean']['output'];
 };
 
-export enum BookingStatus {
-  Booked = 'BOOKED',
-  Cancelled = 'CANCELLED',
-  CheckedOut = 'CHECKED_OUT'
-}
+export { BookingStatus };
 
 export type LoginInput = {
   email: Scalars['String']['input'];
@@ -114,7 +112,7 @@ export type MutationUpdateBookingStatusArgs = {
 
 export type PasswordResetToken = {
   __typename?: 'PasswordResetToken';
-  createdAt: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
   expires: Scalars['String']['output'];
   id: Scalars['String']['output'];
   token: Scalars['String']['output'];
@@ -199,11 +197,7 @@ export type RoomLog = {
   roomId: Scalars['Int']['output'];
 };
 
-export enum RoomType {
-  Double = 'DOUBLE',
-  Luxury = 'LUXURY',
-  Single = 'SINGLE'
-}
+export { RoomType };
 
 export type SearchRoomInput = {
   category?: InputMaybe<RoomType>;
@@ -213,30 +207,27 @@ export type SearchRoomInput = {
 
 export type Session = {
   __typename?: 'Session';
-  createdAt: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
   expires: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   token: Scalars['String']['output'];
-  updatedAt: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   user: User;
 };
 
 export type User = {
   __typename?: 'User';
   bookings: Array<Booking>;
-  createdAt: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   role: UserRole;
   staffBookings: Array<Booking>;
-  updatedAt: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
 };
 
-export enum UserRole {
-  Customer = 'CUSTOMER',
-  Staff = 'STAFF'
-}
+export { UserRole };
 
 export type CreateRoomInput = {
   category: RoomType;
@@ -424,7 +415,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
 }>;
 
 export type PasswordResetTokenResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PasswordResetToken'] = ResolversParentTypes['PasswordResetToken']> = ResolversObject<{
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   expires?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -476,22 +467,22 @@ export type RoomLogResolvers<ContextType = Context, ParentType extends Resolvers
 export type RoomTypeResolvers = EnumResolverSignature<{ DOUBLE?: any, LUXURY?: any, SINGLE?: any }, ResolversTypes['RoomType']>;
 
 export type SessionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Session'] = ResolversParentTypes['Session']> = ResolversObject<{
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   expires?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   bookings?: Resolver<Array<ResolversTypes['Booking']>, ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['UserRole'], ParentType, ContextType>;
   staffBookings?: Resolver<Array<ResolversTypes['Booking']>, ParentType, ContextType>;
-  updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
 

@@ -17,6 +17,11 @@ const config: CodegenConfig = {
           UserRole: "@/generated/prisma/client#UserRole",
           BookingStatus: "@/generated/prisma/client#BookingStatus"
         },
+        enumValues: {
+          RoomType: "@/generated/prisma/client#RoomType",
+          UserRole: "@/generated/prisma/client#UserRole",
+          BookingStatus: "@/generated/prisma/client#BookingStatus"
+        },
       },
     },
   },
