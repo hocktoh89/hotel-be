@@ -23,9 +23,13 @@
     "db:generate": "npx prisma generate",
     "db:push": "npx prisma db push",
     "db:migrate": "npx prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
     "script": "tsx src/prisma/script.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
     "dependencies": {
     "@apollo/server": "^5.4.0",
