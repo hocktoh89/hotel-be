@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import { RoomType, UserRole, BookingStatus } from '@/generated/prisma/client';
 import { Context } from '../context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -7,6 +8,8 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type EnumResolverSignature<T, AllowedValues = any> = { [key in keyof T]?: AllowedValues };
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -55,6 +58,7 @@ export type LoginInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   createBooking: Booking;
+  createRoom?: Maybe<Room>;
   createRoomLog: RoomLog;
   login: AuthResponsePayload;
   register: RegisterResponsePayload;
@@ -67,6 +71,11 @@ export type MutationCreateBookingArgs = {
   checkOut: Scalars['String']['input'];
   customerId: Scalars['String']['input'];
   roomId: Scalars['Int']['input'];
+};
+
+
+export type MutationCreateRoomArgs = {
+  input: CreateRoomInput;
 };
 
 
@@ -216,6 +225,12 @@ export enum UserRole {
   Staff = 'STAFF'
 }
 
+export type CreateRoomInput = {
+  category: RoomType;
+  number: Scalars['String']['input'];
+  price: Scalars['Float']['input'];
+};
+
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
 
@@ -291,15 +306,15 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
   ResponsePayload:
     | ( Partial<AuthResponsePayload> )
-    | ( Partial<RegisterResponsePayload> )
+    | ( Partial<Omit<RegisterResponsePayload, 'user'> & { user?: Maybe<_RefType['User']> }> )
   ;
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   AuthResponsePayload: ResolverTypeWrapper<Partial<AuthResponsePayload>>;
-  Booking: ResolverTypeWrapper<Partial<Booking>>;
-  BookingStatus: ResolverTypeWrapper<Partial<BookingStatus>>;
+  Booking: ResolverTypeWrapper<Partial<Omit<Booking, 'customer' | 'logs' | 'room' | 'staff' | 'status'> & { customer: ResolversTypes['User'], logs: Array<ResolversTypes['RoomLog']>, room: ResolversTypes['Room'], staff?: Maybe<ResolversTypes['User']>, status: ResolversTypes['BookingStatus'] }>>;
+  BookingStatus: ResolverTypeWrapper<BookingStatus>;
   Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']['output']>>;
   DateTime: ResolverTypeWrapper<Partial<Scalars['DateTime']['output']>>;
   Float: ResolverTypeWrapper<Partial<Scalars['Float']['output']>>;
@@ -307,25 +322,26 @@ export type ResolversTypes = ResolversObject<{
   Int: ResolverTypeWrapper<Partial<Scalars['Int']['output']>>;
   LoginInput: ResolverTypeWrapper<Partial<LoginInput>>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
-  PasswordResetToken: ResolverTypeWrapper<Partial<PasswordResetToken>>;
+  PasswordResetToken: ResolverTypeWrapper<Partial<Omit<PasswordResetToken, 'user'> & { user: ResolversTypes['User'] }>>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   RegisterInput: ResolverTypeWrapper<Partial<RegisterInput>>;
-  RegisterResponsePayload: ResolverTypeWrapper<Partial<RegisterResponsePayload>>;
+  RegisterResponsePayload: ResolverTypeWrapper<Partial<Omit<RegisterResponsePayload, 'user'> & { user?: Maybe<ResolversTypes['User']> }>>;
   ResponsePayload: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['ResponsePayload']>;
-  Room: ResolverTypeWrapper<Partial<Room>>;
-  RoomLog: ResolverTypeWrapper<Partial<RoomLog>>;
-  RoomType: ResolverTypeWrapper<Partial<RoomType>>;
+  Room: ResolverTypeWrapper<Partial<Omit<Room, 'bookings' | 'category' | 'logs'> & { bookings: Array<ResolversTypes['Booking']>, category: ResolversTypes['RoomType'], logs: Array<ResolversTypes['RoomLog']> }>>;
+  RoomLog: ResolverTypeWrapper<Partial<Omit<RoomLog, 'booking' | 'room'> & { booking?: Maybe<ResolversTypes['Booking']>, room: ResolversTypes['Room'] }>>;
+  RoomType: ResolverTypeWrapper<RoomType>;
   SearchRoomInput: ResolverTypeWrapper<Partial<SearchRoomInput>>;
-  Session: ResolverTypeWrapper<Partial<Session>>;
+  Session: ResolverTypeWrapper<Partial<Omit<Session, 'user'> & { user: ResolversTypes['User'] }>>;
   String: ResolverTypeWrapper<Partial<Scalars['String']['output']>>;
-  User: ResolverTypeWrapper<Partial<User>>;
-  UserRole: ResolverTypeWrapper<Partial<UserRole>>;
+  User: ResolverTypeWrapper<Partial<Omit<User, 'bookings' | 'role' | 'staffBookings'> & { bookings: Array<ResolversTypes['Booking']>, role: ResolversTypes['UserRole'], staffBookings: Array<ResolversTypes['Booking']> }>>;
+  UserRole: ResolverTypeWrapper<UserRole>;
+  createRoomInput: ResolverTypeWrapper<Partial<CreateRoomInput>>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   AuthResponsePayload: Partial<AuthResponsePayload>;
-  Booking: Partial<Booking>;
+  Booking: Partial<Omit<Booking, 'customer' | 'logs' | 'room' | 'staff'> & { customer: ResolversParentTypes['User'], logs: Array<ResolversParentTypes['RoomLog']>, room: ResolversParentTypes['Room'], staff?: Maybe<ResolversParentTypes['User']> }>;
   Boolean: Partial<Scalars['Boolean']['output']>;
   DateTime: Partial<Scalars['DateTime']['output']>;
   Float: Partial<Scalars['Float']['output']>;
@@ -333,17 +349,18 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Partial<Scalars['Int']['output']>;
   LoginInput: Partial<LoginInput>;
   Mutation: Record<PropertyKey, never>;
-  PasswordResetToken: Partial<PasswordResetToken>;
+  PasswordResetToken: Partial<Omit<PasswordResetToken, 'user'> & { user: ResolversParentTypes['User'] }>;
   Query: Record<PropertyKey, never>;
   RegisterInput: Partial<RegisterInput>;
-  RegisterResponsePayload: Partial<RegisterResponsePayload>;
+  RegisterResponsePayload: Partial<Omit<RegisterResponsePayload, 'user'> & { user?: Maybe<ResolversParentTypes['User']> }>;
   ResponsePayload: ResolversInterfaceTypes<ResolversParentTypes>['ResponsePayload'];
-  Room: Partial<Room>;
-  RoomLog: Partial<RoomLog>;
+  Room: Partial<Omit<Room, 'bookings' | 'logs'> & { bookings: Array<ResolversParentTypes['Booking']>, logs: Array<ResolversParentTypes['RoomLog']> }>;
+  RoomLog: Partial<Omit<RoomLog, 'booking' | 'room'> & { booking?: Maybe<ResolversParentTypes['Booking']>, room: ResolversParentTypes['Room'] }>;
   SearchRoomInput: Partial<SearchRoomInput>;
-  Session: Partial<Session>;
+  Session: Partial<Omit<Session, 'user'> & { user: ResolversParentTypes['User'] }>;
   String: Partial<Scalars['String']['output']>;
-  User: Partial<User>;
+  User: Partial<Omit<User, 'bookings' | 'staffBookings'> & { bookings: Array<ResolversParentTypes['Booking']>, staffBookings: Array<ResolversParentTypes['Booking']> }>;
+  createRoomInput: Partial<CreateRoomInput>;
 }>;
 
 export type AuthResponsePayloadResolvers<ContextType = Context, ParentType extends ResolversParentTypes['AuthResponsePayload'] = ResolversParentTypes['AuthResponsePayload']> = ResolversObject<{
@@ -368,12 +385,15 @@ export type BookingResolvers<ContextType = Context, ParentType extends Resolvers
   status?: Resolver<ResolversTypes['BookingStatus'], ParentType, ContextType>;
 }>;
 
+export type BookingStatusResolvers = EnumResolverSignature<{ BOOKED?: any, CANCELLED?: any, CHECKED_OUT?: any }, ResolversTypes['BookingStatus']>;
+
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
   name: 'DateTime';
 }
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createBooking?: Resolver<ResolversTypes['Booking'], ParentType, ContextType, RequireFields<MutationCreateBookingArgs, 'checkIn' | 'checkOut' | 'customerId' | 'roomId'>>;
+  createRoom?: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'input'>>;
   createRoomLog?: Resolver<ResolversTypes['RoomLog'], ParentType, ContextType, RequireFields<MutationCreateRoomLogArgs, 'note' | 'roomId'>>;
   login?: Resolver<ResolversTypes['AuthResponsePayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
   register?: Resolver<ResolversTypes['RegisterResponsePayload'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'input'>>;
@@ -430,6 +450,8 @@ export type RoomLogResolvers<ContextType = Context, ParentType extends Resolvers
   roomId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 }>;
 
+export type RoomTypeResolvers = EnumResolverSignature<{ DOUBLE?: any, LUXURY?: any, SINGLE?: any }, ResolversTypes['RoomType']>;
+
 export type SessionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Session'] = ResolversParentTypes['Session']> = ResolversObject<{
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   expires?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -450,9 +472,12 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
 
+export type UserRoleResolvers = EnumResolverSignature<{ CUSTOMER?: any, STAFF?: any }, ResolversTypes['UserRole']>;
+
 export type Resolvers<ContextType = Context> = ResolversObject<{
   AuthResponsePayload?: AuthResponsePayloadResolvers<ContextType>;
   Booking?: BookingResolvers<ContextType>;
+  BookingStatus?: BookingStatusResolvers;
   DateTime?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   PasswordResetToken?: PasswordResetTokenResolvers<ContextType>;
@@ -461,7 +486,9 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   ResponsePayload?: ResponsePayloadResolvers<ContextType>;
   Room?: RoomResolvers<ContextType>;
   RoomLog?: RoomLogResolvers<ContextType>;
+  RoomType?: RoomTypeResolvers;
   Session?: SessionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserRole?: UserRoleResolvers;
 }>;
 

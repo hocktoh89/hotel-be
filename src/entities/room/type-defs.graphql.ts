@@ -11,6 +11,12 @@ export const typeDefs = gql`
     query: String!
   }
 
+  input createRoomInput {
+    number: String!
+    category: RoomType!
+    price: Float!
+  }
+
   type Room {
     id: Int!
     number: String!
@@ -25,5 +31,9 @@ export const typeDefs = gql`
     # Staff & Customer: View available rooms
     rooms(category: RoomType): [Room!]!
     room(id: Int!): Room
+  }
+
+  type Mutation {
+    createRoom(input: createRoomInput!): Room
   }
 `;

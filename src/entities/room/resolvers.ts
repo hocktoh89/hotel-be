@@ -16,6 +16,20 @@ const resolvers: Resolvers = {
       return jobs;
     },
   },
+  Mutation: {
+    createRoom: async (root, args, { prisma }) => {
+      const { number, category, price } = args.input;
+
+      const room = await prisma.room.create({
+        data: {
+          number,
+          category,
+          price,
+        },
+      });
+      return room;
+    },
+  },
 };
 
 export default resolvers;

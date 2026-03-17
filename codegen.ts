@@ -12,12 +12,11 @@ const config: CodegenConfig = {
           DateTime: "Date"
         },
         contextType: "../context#Context",
-        // mappers: {
-        //   // TODO
-        //   // Map your GraphQL types to your database models
-        //   // Eg.
-        //   // User: "../models/User#UserModel",
-        // },
+        mappers: {
+          RoomType: "@/generated/prisma/client#RoomType",
+          UserRole: "@/generated/prisma/client#UserRole",
+          BookingStatus: "@/generated/prisma/client#BookingStatus"
+        },
       },
     },
   },
