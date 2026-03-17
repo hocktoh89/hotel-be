@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "mikestead.dotenv",
+        "codezombiech.gitignore",
+        "esbenp.prettier-vscode",
+        "rvest.vs-code-prettier-eslint",
+    ]
+}
