@@ -13,6 +13,29 @@ datasource db {
   schemas  = ["hotel"]
 }
 
+enum UserRole {
+  STAFF
+  CUSTOMER
+
+  @@schema("hotel")
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  LUXURY
+
+  @@schema("hotel")
+}
+
+enum BookingStatus {
+  BOOKED
+  CANCELLED 
+  CHECKED_OUT
+
+  @@schema("hotel")
+}
+
 model Session {
   id        String   @id @default(cuid())
   userId    String
@@ -37,6 +60,7 @@ model PasswordResetToken {
   @@schema("hotel")
 }
 
+// Everyone who logs in
 model User {
   id                  String               @id @default(cuid())
   email               String               @unique
@@ -46,24 +70,66 @@ model User {
   updatedAt           DateTime             @updatedAt
   passwordResetTokens PasswordResetToken[]
   sessions            Session[]
+  role     UserRole @default(CUSTOMER)
+  
+  // Relations
+  bookings      Booking[] @relation("CustomerBookings")
+  staffBookings Booking[] @relation("StaffManaged")
 
   @@map("users")
   @@schema("hotel")
 }
 
+// The physical rooms
+model Room {
+  id       Int    @id @default(autoincrement())
+  number   String @unique // e.g., "247"
+  category RoomType @default(SINGLE)
+  price    Float
+  
+  bookings Booking[]
+  logs     RoomLog[]
 
-enum UserRole {
-  ADMIN
-  CUSTOMER
-
+  @@map("rooms")
   @@schema("hotel")
 }
 
-enum BookingStatus {
-  PENDING
-  COMPLETED
-  CANCELLED
+// The connection between a User and a Room
+model Booking {
+  id         Int      @id @default(autoincrement())
+  
+  // The person staying
+  customerId String
+  customer   User     @relation("CustomerBookings", fields: [customerId], references: [id])
 
+  // The room they are in
+  roomId     Int
+  room       Room     @relation(fields: [roomId], references: [id])
+
+  // The staff who helped (optional)
+  staffId    String?
+  staff      User?    @relation("StaffManaged", fields: [staffId], references: [id])
+
+  checkIn    DateTime
+  checkOut   DateTime
+  status     BookingStatus  @default(BOOKED)
+  
+  logs       RoomLog[]
+
+  @@map("bookings")
   @@schema("hotel")
 }
 
+// To track "who stayed there when damage was reported"
+model RoomLog {
+  id        Int      @id @default(autoincrement())
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
+  bookingId Int?     // Links to the guest who was there at the time
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+  note      String   // e.g., "Broken window discovered"
+  createdAt DateTime @default(now())
+
+  @@map("roomlogs")
+  @@schema("hotel")
+}
