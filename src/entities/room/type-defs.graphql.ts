@@ -2,9 +2,9 @@ import gql from 'graphql-tag';
 
 export const typeDefs = gql`
   enum RoomType {
-    FULL_TIME
-    PART_TIME
-    INTERNSHIP
+    SINGLE
+    DOUBLE
+    LUXURY
   }
 
   input SearchRoomInput {
@@ -12,17 +12,18 @@ export const typeDefs = gql`
   }
 
   type Room {
-    id: ID!
-    description: String!
-    location: String!
-    type: RoomType!
-    price: Int!
-    createdAt: DateTime!
-    updatedAt: DateTime!
-    isBooked: Boolean!
+    id: Int!
+    number: String!
+    category: RoomType!
+    price: Float!
+    bookings: [Booking!]!
+    logs: [RoomLog!]!
   }
 
   type Query {
     searchRooms(input: SearchRoomInput!): [Room!]!
+    # Staff & Customer: View available rooms
+    rooms(category: RoomType): [Room!]!
+    room(id: Int!): Room
   }
 `;

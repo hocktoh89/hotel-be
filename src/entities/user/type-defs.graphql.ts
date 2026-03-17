@@ -34,12 +34,15 @@ export const typeDefs = gql`
     id: ID!
     email: String!
     username: String!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    role: UserRole!
+    createdAt: String!
+    updatedAt: String!
+    bookings: [Booking!]!
+    staffBookings: [Booking!]!
   }
 
   enum UserRole {
-    ADMIN
+    STAFF
     CUSTOMER
   }
 
