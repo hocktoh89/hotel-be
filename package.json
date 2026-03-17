@@ -24,6 +24,9 @@
     "db:push": "npx prisma db push",
     "db:migrate": "npx prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:setup": "bash scripts/setup-db.sh",
+    "db:reset": "bash scripts/reset-db.sh",
+    "db:stop": "bash scripts/stop-db.sh",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
     "script": "tsx src/prisma/script.ts"
