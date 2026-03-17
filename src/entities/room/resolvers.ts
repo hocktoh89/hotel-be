@@ -15,6 +15,10 @@ const resolvers: Resolvers = {
       });
       return jobs;
     },
+    rooms: async (root, args, context) => {
+      const rooms = await context.prisma.room.findMany();
+      return rooms;
+    },
   },
   Mutation: {
     createRoom: async (root, args, { prisma }) => {
