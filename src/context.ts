@@ -9,13 +9,14 @@ const JWT_SECRET = process.env.JWT_SECRET || '';
 export interface Context {
   prisma: PrismaClient;
   auth: {
-    user: { id: string; isAdmin: boolean } | null;
+    user: { userId: string; isAdmin: boolean } | null;
     login: (args: { id: string; isAdmin: boolean }) => void;
     logout: () => void;
   };
 }
 
-const parseToken = (token: string) => {
+const parseToken = (rawToken: string | undefined) => {
+  const [scheme, token] = rawToken?.trim().split(' ') || [];
   const parsedToken = token ? jwt.verify(token, JWT_SECRET) : null;
   if (!parsedToken) {
     return null;
@@ -23,7 +24,7 @@ const parseToken = (token: string) => {
 
   const payload = z
     .object({
-      id: z.string(),
+      userId: z.string(),
       isAdmin: z.boolean(),
     })
     .safeParse(parsedToken);
@@ -38,14 +39,18 @@ const createContext = async ({
   req: Request;
   res: Response;
 }): Promise<Context> => {
-  const token = req.cookies?.token;
+  // const token = req.cookies?.token;
+  const token = req.headers.authorization;
   const user = parseToken(token);
+
+  // console.log('. user ', user);
 
   return {
     prisma,
     auth: {
       user,
       login: (args: { id: string; isAdmin: boolean }) => {
+        console.log('.  args.  ', args);
         const token = jwt.sign(args, JWT_SECRET);
         res.cookie('token', token, {
           domain: 'localhost',

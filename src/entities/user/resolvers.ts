@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken';
 const resolvers: Resolvers = {
   Query: {
     me: async (root, args, context) => {
+      console.log('.  context.auth.user.  ', context.auth.user);
       if (!context.auth.user) {
         return null;
         // throw new GraphQLError('Not authenticated', {
@@ -72,6 +73,7 @@ const resolvers: Resolvers = {
           {
             userId: user.id,
             email,
+            isAdmin: user.role === 'STAFF',
           },
           process.env.JWT_SECRET as string,
           {
@@ -123,7 +125,7 @@ const resolvers: Resolvers = {
         code: 201,
         success: true,
         message: 'register in successful',
-        user
+        user,
       };
     },
   },
