@@ -22,7 +22,7 @@ const resolvers: Resolvers = {
       }
 
       const user = await context.prisma.user.findUnique({
-        where: { id: context.auth.user.id },
+        where: { id: context.auth.user.userId },
       });
 
       if (!user) {
@@ -42,9 +42,9 @@ const resolvers: Resolvers = {
     },
   },
   Mutation: {
-    login: async (_parent, { input: { email, password } }, { prisma }) => {
+    login: async (_parent, { input: { email, password } }, context) => {
       try {
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await context.prisma.user.findUnique({ where: { email } });
 
         if (user === null || user === undefined) {
           return new GraphQLError('Invalid credentials', {
@@ -69,6 +69,12 @@ const resolvers: Resolvers = {
           }) as unknown as AuthResponsePayload;
         }
 
+        // // 1. Trigger the context helper to set the HTTP-only cookie
+        // context.auth.login({
+        //   id: user.id,
+        //   isAdmin: user.role === 'STAFF',
+        // });
+
         const token = jwt.sign(
           {
             userId: user.id,
@@ -85,7 +91,7 @@ const resolvers: Resolvers = {
 
         expires.setDate(expires.getDate() + 1);
 
-        await prisma.session.create({
+        await context.prisma.session.create({
           data: {
             userId: user.id,
             token,

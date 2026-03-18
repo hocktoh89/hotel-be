@@ -33,11 +33,21 @@ await server.start();
 // so we allow for that, too
 const validCharset = /^utf-(8|((16|32)(le|be)?))$/i;
 
+const corsOptions = {
+  // Must match your frontend exactly
+  origin: 'http://localhost:5173',
+  // Required for cookies or Authorization headers to work
+  credentials: true,
+  // The headers you want to allow
+  allowedHeaders: ['Authorization', 'Content-Type'],
+};
+
 // Set up our Express middleware to handle CORS, body parsing,
 // and our expressMiddleware function.
 app.use(
   '/',
-  cors<cors.CorsRequest>(),
+  // cors<cors.CorsRequest>(),
+  cors(corsOptions),
   express.json({
     // 50mb is the limit that `startStandaloneServer` uses to cover all possible bases, but you may configure this to suit your needs.
     // Generally we recommend keeping this as small as possible to still suit your use case.

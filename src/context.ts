@@ -21,7 +21,7 @@ const parseToken = (rawToken: string | undefined) => {
   if (!parsedToken) {
     return null;
   }
-
+  console.log('. parsedToken ', parsedToken);
   const payload = z
     .object({
       userId: z.string(),
@@ -43,7 +43,7 @@ const createContext = async ({
   const token = req.headers.authorization;
   const user = parseToken(token);
 
-  // console.log('. user ', user);
+  console.log('. user ', user);
 
   return {
     prisma,
