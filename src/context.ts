@@ -10,7 +10,6 @@ export interface Context {
   prisma: PrismaClient;
   auth: {
     me: { id: string; email: string; isAdmin: boolean } | null;
-    // user: { userId: string; isAdmin: boolean } | null;
     login: (args: { id: string; email: string; isAdmin: boolean }) => void;
     // logout: () => void;
   };
@@ -41,20 +40,15 @@ const createContext = async ({
   req: Request;
   res: Response;
 }): Promise<Context> => {
-  // const token = req.cookies?.token;
   const token = req.headers.authorization;
-  const user = parseToken(token);
-
-  // console.log('. user ', user);
+  const currentUser = parseToken(token);
 
   return {
     prisma,
     auth: {
-      me: user,
+      me: currentUser,
       login: (args: { id: string; email: string; isAdmin: boolean }) => {
-        // console.log('.  args.  ', args);
         const token = jwt.sign(args, JWT_SECRET);
-        console.log('.  toke n', token);
         res.cookie('token', token, {
           // domain: 'localhost',
           expires: new Date(Date.now() + 30 * 60 * 1000),
