@@ -23,6 +23,7 @@ const httpServer = http.createServer(app);
 const server = new ApolloServer<MyContext>({
   schema: schema,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  introspection: true,
 });
 // Ensure we wait for our server to start
 await server.start();
@@ -35,7 +36,13 @@ const validCharset = /^utf-(8|((16|32)(le|be)?))$/i;
 
 const corsOptions = {
   // Must match your frontend exactly
-  origin: 'http://localhost:5173',
+  // origin: 'http://localhost:5173',
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:4000',
+    'https://studio.apollographql.com',
+    'https://sandbox.embed.apollographql.com',
+  ],
   // Required for cookies or Authorization headers to work
   credentials: true,
   // The headers you want to allow

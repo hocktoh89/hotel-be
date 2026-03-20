@@ -9,9 +9,10 @@ const JWT_SECRET = process.env.JWT_SECRET || '';
 export interface Context {
   prisma: PrismaClient;
   auth: {
-    user: { userId: string; isAdmin: boolean } | null;
-    login: (args: { id: string; isAdmin: boolean }) => void;
-    logout: () => void;
+    me: { id: string; email: string; isAdmin: boolean } | null;
+    // user: { userId: string; isAdmin: boolean } | null;
+    login: (args: { id: string; email: string; isAdmin: boolean }) => void;
+    // logout: () => void;
   };
 }
 
@@ -21,10 +22,11 @@ const parseToken = (rawToken: string | undefined) => {
   if (!parsedToken) {
     return null;
   }
-  console.log('. parsedToken ', parsedToken);
+  // console.log('. parsedToken ', parsedToken);
   const payload = z
     .object({
-      userId: z.string(),
+      id: z.string(),
+      email: z.string(),
       isAdmin: z.boolean(),
     })
     .safeParse(parsedToken);
@@ -43,24 +45,28 @@ const createContext = async ({
   const token = req.headers.authorization;
   const user = parseToken(token);
 
-  console.log('. user ', user);
+  // console.log('. user ', user);
 
   return {
     prisma,
     auth: {
-      user,
-      login: (args: { id: string; isAdmin: boolean }) => {
-        console.log('.  args.  ', args);
+      me: user,
+      login: (args: { id: string; email: string; isAdmin: boolean }) => {
+        // console.log('.  args.  ', args);
         const token = jwt.sign(args, JWT_SECRET);
+        console.log('.  toke n', token);
         res.cookie('token', token, {
-          domain: 'localhost',
-          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          // domain: 'localhost',
+          expires: new Date(Date.now() + 30 * 60 * 1000),
           httpOnly: true,
+          sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'none',
+          secure: true,
+          // secure: process.env.NODE_ENV === 'production',
         });
       },
-      logout: () => {
-        res.clearCookie('token');
-      },
+      // logout: () => {
+      //   res.clearCookie('token');
+      // },
     },
   };
 };

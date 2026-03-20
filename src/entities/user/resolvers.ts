@@ -9,36 +9,47 @@ import jwt from 'jsonwebtoken';
 
 const resolvers: Resolvers = {
   Query: {
-    me: async (root, args, context) => {
-      console.log('.  context.auth.user.  ', context.auth.user);
-      if (!context.auth.user) {
-        return null;
-        // throw new GraphQLError('Not authenticated', {
-        //   extensions: {
-        //     code: 'UNAUTHENTICATED',
-        //     http: { status: 401 },
-        //   },
-        // });
+    me: async (parent, args, context) => {
+      try {
+        const foundMe = context.auth.me;
+        console.log('  foundMe context.auth  ', context.auth);
+        console.log('  foundMe context.auth.me  ', foundMe);
+
+        if (!foundMe) {
+          throw new GraphQLError('Not authenticated', {
+            extensions: {
+              code: 'UNAUTHENTICATED',
+              http: { status: 401 },
+            },
+          });
+        }
+
+        const user = await context.prisma.user.findUnique({
+          where: { id: foundMe.id },
+        });
+
+        if (!user) {
+          throw new GraphQLError('User not found', {
+            extensions: {
+              code: 'NOT_FOUND',
+              http: { status: 404 },
+            },
+          });
+        }
+
+        return {
+          ...foundMe,
+          role: user.role as UserRole,
+        };
+      } catch (err) {
+        throw new GraphQLError('Error Accessing Me!', {
+          extensions: {
+            code: 'BAD_REQUEST',
+            http: { status: 400 },
+            message: err,
+          },
+        });
       }
-
-      const user = await context.prisma.user.findUnique({
-        where: { id: context.auth.user.userId },
-      });
-
-      if (!user) {
-        // throw new GraphQLError('User not found', {
-        //   extensions: {
-        //     code: 'NOT_FOUND',
-        //     http: { status: 404 },
-        //   },
-        // });
-        return null;
-      }
-
-      return {
-        ...user,
-        role: user.role as UserRole,
-      };
     },
   },
   Mutation: {
@@ -69,41 +80,42 @@ const resolvers: Resolvers = {
           }) as unknown as AuthResponsePayload;
         }
 
-        // // 1. Trigger the context helper to set the HTTP-only cookie
-        // context.auth.login({
-        //   id: user.id,
-        //   isAdmin: user.role === 'STAFF',
-        // });
-
-        const token = jwt.sign(
-          {
-            userId: user.id,
-            email,
-            isAdmin: user.role === 'STAFF',
-          },
-          process.env.JWT_SECRET as string,
-          {
-            expiresIn: '1h',
-          },
-        );
-
-        const expires = new Date();
-
-        expires.setDate(expires.getDate() + 1);
-
-        await context.prisma.session.create({
-          data: {
-            userId: user.id,
-            token,
-            expires,
-          },
+        // 1. Trigger the context helper to set the HTTP-only cookie
+        await context.auth.login({
+          id: user.id,
+          email: user.email,
+          isAdmin: user.role === 'STAFF',
         });
+
+        // const token = jwt.sign(
+        //   {
+        //     userId: user.id,
+        //     email,
+        //     isAdmin: user.role === 'STAFF',
+        //   },
+        //   process.env.JWT_SECRET as string,
+        //   {
+        //     expiresIn: '1h',
+        //   },
+        // );
+
+        // const expires = new Date();
+
+        // expires.setDate(expires.getDate() + 1);
+
+        // await context.prisma.session.create({
+        //   data: {
+        //     userId: user.id,
+        //     token,
+        //     expires,
+        //   },
+        // });
 
         return {
           code: 201,
           success: true,
           message: 'Log in successful',
-          token,
+          // token,
         };
       } catch (error) {
         return new GraphQLError('Failed to log in.', {

@@ -56,7 +56,6 @@ export const typeDefs = gql`
     code: Int!
     success: Boolean!
     message: String!
-    token: String
   }
 
   type RegisterResponsePayload implements ResponsePayload {
