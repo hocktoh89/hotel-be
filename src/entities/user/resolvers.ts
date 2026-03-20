@@ -7,6 +7,8 @@ import bcrypt from 'bcryptjs';
 import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 
+const saltRounds = 10;
+
 const resolvers: Resolvers = {
   Query: {
     me: async (parent, args, context) => {
@@ -67,9 +69,9 @@ const resolvers: Resolvers = {
         }
 
         // TO-DO: bypass encryption password check for now
-        // const passwordCorrect = await bcrypt.compare(password, user.password);
+        const passwordCorrect = await bcrypt.compare(password, user.password);
 
-        const passwordCorrect = password === user.password;
+        // const passwordCorrect = password === user.password;
 
         if (!passwordCorrect) {
           return new GraphQLError('Invalid credentials', {
@@ -115,7 +117,6 @@ const resolvers: Resolvers = {
           code: 201,
           success: true,
           message: 'Log in successful',
-          // token,
         };
       } catch (error) {
         return new GraphQLError('Failed to log in.', {
@@ -131,10 +132,16 @@ const resolvers: Resolvers = {
       { input: { email, password, username } },
       { prisma },
     ) => {
+      // try {
+      let hashedPwd: string | undefined = await bcrypt.hash(
+        password,
+        saltRounds,
+      );
+
       const user = await prisma.user.create({
         data: {
           email,
-          password,
+          password: hashedPwd,
           username,
         },
       });
@@ -145,6 +152,14 @@ const resolvers: Resolvers = {
         message: 'register in successful',
         user,
       };
+      // } catch (err) {
+      //   return new GraphQLError('Failed to register.', {
+      //     extensions: {
+      //       code: ['INTERNAL_ERROR'],
+      //       http: { status: 500 },
+      //     },
+      //   }) as unknown as AuthResponsePayload;
+      // }
     },
   },
 };

@@ -11,11 +11,12 @@ export interface Context {
   auth: {
     me: { id: string; email: string; isAdmin: boolean } | null;
     login: (args: { id: string; email: string; isAdmin: boolean }) => void;
-    // logout: () => void;
+    logout: () => void;
   };
 }
 
 const parseToken = (rawToken: string | undefined) => {
+  console.log('. rawToken.  ', rawToken);
   const [scheme, token] = rawToken?.trim().split(' ') || [];
   const parsedToken = token ? jwt.verify(token, JWT_SECRET) : null;
   if (!parsedToken) {
@@ -48,19 +49,21 @@ const createContext = async ({
     auth: {
       me: currentUser,
       login: (args: { id: string; email: string; isAdmin: boolean }) => {
-        const token = jwt.sign(args, JWT_SECRET);
+        const token = jwt.sign(args, JWT_SECRET, {
+          expiresIn: '1h',
+        });
         res.cookie('token', token, {
           // domain: 'localhost',
-          expires: new Date(Date.now() + 30 * 60 * 1000),
+          // expires: new Date(Date.now() + 30 * 60 * 1000),
           httpOnly: true,
           sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'none',
           secure: true,
           // secure: process.env.NODE_ENV === 'production',
         });
       },
-      // logout: () => {
-      //   res.clearCookie('token');
-      // },
+      logout: () => {
+        res.clearCookie('token');
+      },
     },
   };
 };
