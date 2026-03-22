@@ -15,7 +15,7 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-  "build": "tsc",
+    "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx --watch src/index.ts",
     "codegen": "graphql-codegen --config codegen.ts",
@@ -34,18 +34,15 @@
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
-    "dependencies": {
+  "dependencies": {
     "@apollo/server": "^5.4.0",
     "@as-integrations/express5": "^1.1.2",
     "@graphql-codegen/cli": "^6.2.1",
     "@graphql-codegen/typescript": "^5.0.9",
     "@graphql-codegen/typescript-resolvers": "^5.1.7",
-    "@graphql-tools/schema": "^10.0.31",
     "@graphql-tools/graphql-file-loader": "^8.1.12",
     "@graphql-tools/load": "^8.1.8",
-    "graphql-middleware": "^6.1.35",
-    "graphql-shield": "^7.6.5",
-    "graphql-tag": "^2.12.6",
+    "@graphql-tools/schema": "^10.0.31",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "@types/pg": "^8.18.0",
@@ -56,17 +53,20 @@
     "express": "^5.2.1",
     "graphql": "^16.13.1",
     "graphql-import-node": "^0.0.5",
+    "graphql-middleware": "^6.1.35",
+    "graphql-shield": "^7.6.5",
+    "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^6.2.1",
-    "@graphql-codegen/typescript": "^5.0.9",
-    "@graphql-codegen/typescript-resolvers": "^5.1.7",
     "@graphql-codegen/near-operation-file-preset": "^5.0.0",
+    "@graphql-codegen/typescript": "^5.0.9",
     "@graphql-codegen/typescript-operations": "^5.0.9",
     "@graphql-codegen/typescript-react-apollo": "^4.4.1",
+    "@graphql-codegen/typescript-resolvers": "^5.1.7",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",

@@ -5,7 +5,6 @@ import {
 } from '@/types/resolvers-types';
 import bcrypt from 'bcryptjs';
 import { GraphQLError } from 'graphql';
-import jwt from 'jsonwebtoken';
 
 const saltRounds = 10;
 
@@ -14,8 +13,6 @@ const resolvers: Resolvers = {
     me: async (parent, args, context) => {
       try {
         const foundMe = context.auth.me;
-        console.log('  foundMe context.auth  ', context.auth);
-        console.log('  foundMe context.auth.me  ', foundMe);
 
         if (!foundMe) {
           throw new GraphQLError('Not authenticated', {
@@ -68,10 +65,7 @@ const resolvers: Resolvers = {
           }) as unknown as AuthResponsePayload;
         }
 
-        // TO-DO: bypass encryption password check for now
         const passwordCorrect = await bcrypt.compare(password, user.password);
-
-        // const passwordCorrect = password === user.password;
 
         if (!passwordCorrect) {
           return new GraphQLError('Invalid credentials', {
@@ -82,36 +76,11 @@ const resolvers: Resolvers = {
           }) as unknown as AuthResponsePayload;
         }
 
-        // 1. Trigger the context helper to set the HTTP-only cookie
         await context.auth.login({
           id: user.id,
           email: user.email,
           isAdmin: user.role === 'STAFF',
         });
-
-        // const token = jwt.sign(
-        //   {
-        //     userId: user.id,
-        //     email,
-        //     isAdmin: user.role === 'STAFF',
-        //   },
-        //   process.env.JWT_SECRET as string,
-        //   {
-        //     expiresIn: '1h',
-        //   },
-        // );
-
-        // const expires = new Date();
-
-        // expires.setDate(expires.getDate() + 1);
-
-        // await context.prisma.session.create({
-        //   data: {
-        //     userId: user.id,
-        //     token,
-        //     expires,
-        //   },
-        // });
 
         return {
           code: 201,

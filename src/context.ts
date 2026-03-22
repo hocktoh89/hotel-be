@@ -16,13 +16,13 @@ export interface Context {
 }
 
 const parseToken = (rawToken: string | undefined) => {
-  console.log('. rawToken.  ', rawToken);
   const [scheme, token] = rawToken?.trim().split(' ') || [];
   const parsedToken = token ? jwt.verify(token, JWT_SECRET) : null;
+
   if (!parsedToken) {
     return null;
   }
-  // console.log('. parsedToken ', parsedToken);
+
   const payload = z
     .object({
       id: z.string(),
@@ -49,16 +49,16 @@ const createContext = async ({
     auth: {
       me: currentUser,
       login: (args: { id: string; email: string; isAdmin: boolean }) => {
-        const token = jwt.sign(args, JWT_SECRET, {
-          expiresIn: '1h',
+        const token = jwt.sign({ ...args }, JWT_SECRET, {
+          expiresIn: '5m',
         });
+
         res.cookie('token', token, {
           // domain: 'localhost',
           // expires: new Date(Date.now() + 30 * 60 * 1000),
           httpOnly: true,
           sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'none',
           secure: true,
-          // secure: process.env.NODE_ENV === 'production',
         });
       },
       logout: () => {

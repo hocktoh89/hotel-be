@@ -6,10 +6,14 @@ import http from 'http';
 import cors from 'cors';
 import schema from './schema';
 import createContext from './context';
+import { applyMiddleware } from 'graphql-middleware';
+import { permissions } from './permissions';
 
 interface MyContext {
   token?: String;
 }
+
+const schemaWithPermissions = applyMiddleware(schema, permissions);
 
 // Required logic for integrating with Express
 const app = express();
@@ -21,7 +25,7 @@ const httpServer = http.createServer(app);
 // Same ApolloServer initialization as before, plus the drain plugin
 // for our httpServer.
 const server = new ApolloServer<MyContext>({
-  schema: schema,
+  schema: schemaWithPermissions,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   introspection: true,
 });
@@ -36,12 +40,11 @@ const validCharset = /^utf-(8|((16|32)(le|be)?))$/i;
 
 const corsOptions = {
   // Must match your frontend exactly
-  // origin: 'http://localhost:5173',
   origin: [
     'http://localhost:5173',
-    'http://localhost:4000',
-    'https://studio.apollographql.com',
-    'https://sandbox.embed.apollographql.com',
+    // 'http://localhost:4000',
+    // 'https://studio.apollographql.com',
+    // 'https://sandbox.embed.apollographql.com',
   ],
   // Required for cookies or Authorization headers to work
   credentials: true,
