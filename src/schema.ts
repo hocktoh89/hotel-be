@@ -26,6 +26,11 @@ import {
   typeDefs as bookingTypeDefs,
 } from './entities/booking/index.js';
 
+import {
+  directive as authDirective,
+  typeDefs as authDirectiveTypeDefs,
+} from './directives/auth/index.js';
+
 const schema = makeExecutableSchema({
   typeDefs: [
     scalarTypeDefs,
@@ -33,6 +38,7 @@ const schema = makeExecutableSchema({
     userTypeDefs,
     roomLogTypeDefs,
     bookingTypeDefs,
+    authDirectiveTypeDefs,
   ],
   resolvers: [
     scalarResolvers,
@@ -43,4 +49,6 @@ const schema = makeExecutableSchema({
   ],
 });
 
-export default schema;
+const schemaWithDirectives = authDirective(schema);
+
+export default schemaWithDirectives;

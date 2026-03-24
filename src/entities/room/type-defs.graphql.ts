@@ -30,6 +30,7 @@ export const typeDefs = gql`
 
   type Query {
     searchAvailableRooms(input: SearchRoomInput!): [Room!]!
+      @auth(role: CUSTOMER)
     # Staff & Customer: View available rooms
     rooms(category: RoomType): [Room!]!
     room(id: Int!): Room
