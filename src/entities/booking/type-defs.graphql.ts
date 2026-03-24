@@ -43,8 +43,10 @@ export const typeDefs = gql`
   type Mutation {
     # Customer/Staff: Create a reservation
     createBooking(input: BookingInput!): BookingResponsePayload!
+      @auth(roles: [STAFF, CUSTOMER])
 
     # Staff/Customer: Cancel a booking
     updateBookingStatus(id: Int!, status: BookingStatus!): Booking!
+      @auth(roles: [STAFF, CUSTOMER])
   }
 `;

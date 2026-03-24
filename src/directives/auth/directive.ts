@@ -2,6 +2,7 @@ import { mapSchema, getDirective, MapperKind } from '@graphql-tools/utils';
 import { defaultFieldResolver, GraphQLSchema } from 'graphql';
 import { Context } from '../../context';
 import { UserRole } from '../../types/resolvers-types';
+import { GraphQLError } from 'graphql';
 
 const authDirective = (schema: GraphQLSchema) => {
   return mapSchema(schema, {
@@ -11,21 +12,30 @@ const authDirective = (schema: GraphQLSchema) => {
       if (authDirective) {
         const { resolve = defaultFieldResolver } = fieldConfig;
 
-        const requiredRole = authDirective.role as UserRole;
+        const requiredRoles = authDirective.roles as [UserRole];
         fieldConfig.resolve = async function (
           source,
           args,
           context: Context,
           info,
         ) {
-          const user = context.auth.me;
+          const me = context.auth.me;
 
-          if (!user) {
-            throw new Error('Not authenticated');
+          if (!me) {
+            throw new GraphQLError('Not authenticated', {
+              extensions: {
+                code: 'UNAUTHENTICATED',
+                http: { status: 401 },
+              },
+            });
           }
 
-          if (requiredRole === UserRole.STAFF && !user.isAdmin) {
+          if (!requiredRoles.includes(UserRole.STAFF) && !me.isAdmin) {
             throw new Error('Not authorized - Admin access required! ');
+          }
+
+          if (!requiredRoles.includes(UserRole.CUSTOMER)) {
+            throw new Error('Not authorized - customer access required! ');
           }
 
           return resolve(source, args, context, info);

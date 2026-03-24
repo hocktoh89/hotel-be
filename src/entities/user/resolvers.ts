@@ -15,10 +15,10 @@ const resolvers: Resolvers = {
         const foundMe = context.auth.me;
 
         if (!foundMe) {
-          throw new GraphQLError('Not authenticated', {
+          throw new GraphQLError('Me not exist!', {
             extensions: {
-              code: 'UNAUTHENTICATED',
-              http: { status: 401 },
+              code: 'NOT_FOUND',
+              http: { status: 404 },
             },
           });
         }
@@ -28,7 +28,7 @@ const resolvers: Resolvers = {
         });
 
         if (!user) {
-          throw new GraphQLError('User not found', {
+          throw new GraphQLError('Me not matching user!', {
             extensions: {
               code: 'NOT_FOUND',
               http: { status: 404 },

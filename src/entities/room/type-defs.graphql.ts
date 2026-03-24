@@ -30,13 +30,13 @@ export const typeDefs = gql`
 
   type Query {
     searchAvailableRooms(input: SearchRoomInput!): [Room!]!
-      @auth(role: CUSTOMER)
+      @auth(roles: [STAFF, CUSTOMER])
     # Staff & Customer: View available rooms
-    rooms(category: RoomType): [Room!]!
-    room(id: Int!): Room
+    rooms(category: RoomType): [Room!]! @auth(roles: [CUSTOMER])
+    room(id: Int!): Room @auth(roles: [CUSTOMER])
   }
 
   type Mutation {
-    createRoom(input: createRoomInput!): Room
+    createRoom(input: createRoomInput!): Room @auth(roles: [STAFF])
   }
 `;
